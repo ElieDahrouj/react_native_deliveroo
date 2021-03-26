@@ -3,11 +3,11 @@ import { View, Text, StyleSheet,Image,TouchableOpacity,Modal,Dimensions,ScrollVi
 import {Container, Icon, Button} from 'native-base';
 import { SharedElement } from 'react-navigation-shared-element';
 import {connect} from 'react-redux';
-import ParametersRedux, {updateChicken} from '../redux/ParametersRedux';
+import ParametersRedux from '../redux/ParametersRedux';
 
 class detailScreen extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state ={
             modalVisible:false,
             modalId:null,
@@ -15,7 +15,7 @@ class detailScreen extends Component {
             isSelectedCurry:false,
             isSelectedAg:false,
             isSelectedCc:false,
-            itemChicken:0,
+            itemChicken:this.props.chicken,
             scrollY: new Animated.Value(0),
             optionalMenu:[]
         }
@@ -24,8 +24,8 @@ class detailScreen extends Component {
         this.setSelectionCurry = this.setSelectionCurry.bind(this)
         this.setSelectionAg = this.setSelectionAg.bind(this)
         this.setSelectionCc = this.setSelectionCc.bind(this)
-        this.handleIncrements = this.handleIncrements.bind(this)
-        this.handleDecrements = this.handleDecrements.bind(this)
+        // this.handleIncrements = this.handleIncrements.bind(this)
+        // this.handleDecrements = this.handleDecrements.bind(this)
     }
 
     static getDerivedStateFromProps(props, state) {
@@ -78,17 +78,17 @@ class detailScreen extends Component {
         })
     }
 
-    handleIncrements = (number) => {
-        this.setState({
-            itemChicken: this.state.itemChicken + number
-        })
-    }
-
-    handleDecrements = (number) =>{
-        this.setState({
-            itemChicken: this.state.itemChicken - number
-        })
-    }
+    // handleIncrements = (number) => {
+    //     this.setState({
+    //         itemChicken: this.state.itemChicken + number
+    //     })
+    // }
+    //
+    // handleDecrements = (number) =>{
+    //     this.setState({
+    //         itemChicken: this.state.itemChicken - number
+    //     })
+    // }
 
     render() {
         const opacityTranslation = this.state.scrollY.interpolate({
