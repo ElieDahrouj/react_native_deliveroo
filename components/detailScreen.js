@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet,Image,TouchableOpacity,Modal,Dimensions,ScrollView,Animated, CheckBox} from "react-native";
+import { View, Text, StyleSheet,Image,TouchableOpacity,Modal,Dimensions,ScrollView,Animated} from "react-native";
+import CheckBox from '@react-native-community/checkbox';
 import {Container, Icon, Button} from 'native-base';
 import { SharedElement } from 'react-navigation-shared-element';
 import {connect} from 'react-redux';
@@ -92,19 +93,82 @@ class detailScreen extends Component {
 
     render() {
         const opacityTranslation = this.state.scrollY.interpolate({
-            inputRange: [0, 240],
+            inputRange: [0, 190],
             outputRange: [1, 0],
             extrapolate: 'clamp',
+        });
+
+        const HEADER_MIN_HEIGHT = 50;
+        const HEADER_MAX_HEIGHT = 250;
+        const headerHeight = this.state.scrollY.interpolate(
+        {
+            inputRange: [ 0, ( HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT ) ],
+            outputRange: [ HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT ],
+            extrapolate: 'clamp'
+        });
+
+        const headerOpacity = this.state.scrollY.interpolate({
+            inputRange: [146, 152],
+            outputRange: [0, 1],
+            extrapolate: 'clamp',
+        });
+
+        const subMenuHeaderOpacity = this.state.scrollY.interpolate({
+            inputRange: [440, 445],
+            outputRange: [0, 1],
+            extrapolate: 'clamp',
+        });
+
+        const color = this.state.scrollY.interpolate({
+            inputRange: [0, 1],
+            outputRange: ['#ffffff', '#ffffff']
         });
 
         const {navigation, route} = this.props
         const { item } = route.params;
         return (
             <Container style={styles.whitesmokeColor}>
-                <ScrollView onScroll={Animated.event(
+                <Animated.View style={{position:"absolute",top:0, borderBottomColor: "#94bf8c", borderBottomWidth: 0.8 ,paddingHorizontal:18, paddingVertical:10,zIndex:99 ,opacity:headerOpacity,backgroundColor:color,width:Dimensions.get('window').width}}>
+                    <View style={{flexDirection:'row', justifyContent:'space-between'}}>
+                        <View style={{flexDirection:'row', justifyContent:'space-between',alignItems: 'center'}}>
+                            <TouchableOpacity onPress={() => navigation.goBack()}>
+                                <Icon style={[styles.greenDeliveroo,styles.br100]}  name="arrow-back-outline"/>
+                            </TouchableOpacity>
+
+                            <Text style={[styles.titleAnimated,{marginLeft:15}]}>🔥 McDonald'</Text>
+                        </View>
+                        <Icon style={[styles.greenDeliveroo,styles.bgc,styles.br100]}  name="search-outline"/>
+                    </View>
+                </Animated.View>
+
+                <Animated.View style={{position:"absolute",top:64 ,paddingHorizontal:18, paddingVertical:10,zIndex:99 ,opacity:subMenuHeaderOpacity,backgroundColor:color,width:Dimensions.get('window').width}}>
+                    <View style={{paddingVertical:15}}>
+                        <ScrollView horizontal={true}>
+                            <View style={{flexDirection:'row', justifyContent:'space-around',alignItems: 'center',width:Dimensions.get('window').width}}>
+                                <View style={styles.focusColor}>
+                                    <Text>Les Bons plans</Text>
+                                </View>
+
+                                <View>
+                                    <Text style={styles.greenDeliveroo}>Menus</Text>
+                                </View>
+
+                                <View>
+                                    <Text style={styles.greenDeliveroo}>Snacks</Text>
+                                </View>
+
+                                <View>
+                                    <Text style={styles.greenDeliveroo}>Menus specials</Text>
+                                </View>
+                            </View>
+                        </ScrollView>
+                    </View>
+                </Animated.View>
+
+                <Animated.ScrollView onScroll={Animated.event(
                     [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }],{useNativeDriver: false}
                 )}>
-                    <View style={{position: 'relative'}}>
+                    <View>
                         <View style={styles.headerIcon}>
                             <TouchableOpacity onPress={() => navigation.goBack()}>
                                 <Icon style={[styles.greenDeliveroo,styles.bgc,styles.br100]}  name="arrow-back-outline"/>
@@ -115,7 +179,7 @@ class detailScreen extends Component {
                             </View>
                         </View>
 
-                        <Animated.View style={{opacity:opacityTranslation}}>
+                        <Animated.View style={{opacity:opacityTranslation, height:headerHeight}}>
                             <SharedElement id={`item.${item.id}.photo`}>
                                 <Image style={{ width: Dimensions.get('window').width, height: 250}} source={{uri:item.url}}/>
                             </SharedElement>
@@ -124,16 +188,20 @@ class detailScreen extends Component {
 
                     <View style={styles.widthTitle}>
                         <Text style={styles.title}>McDonald'</Text>
+
                         <Text>American Sandwich Burgers</Text>
+
                         <View style={styles.mapStyle}>
                             <Icon style={styles.gray} name="location-outline"/>
                             <Text style={styles.gray}>3.13 Km away * CENTRE COMMERCIAL CRETAIL SOLEIL - 101 AVENUE DU GENERAL DE GAULE *
                                 <Text style={styles.greenDeliveroo}> View map</Text>
                             </Text>
                         </View>
+
                         <Text style={[styles.gray, styles.mv10]}>
                             AMERICAN - BURGER - FASTFOOD
                         </Text>
+
                         <Text style={[styles.greenDeliveroo]}>
                             Show rating details
                         </Text>
@@ -283,7 +351,29 @@ class detailScreen extends Component {
                             </View>
                         })}
                     </View>
-                </ScrollView>
+
+                    <Text style={[styles.widthTitle,styles.fwb]}>MENUS</Text>
+
+                    <View style={[styles.widthTitle]}>
+                        {this.state.optionalMenu.map((item,index) =>{
+                            return <View key={index}>
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        this.handleVisible(true,item.id);
+                                    }}>
+                                    <View style={[styles.fxd,styles.aIc,styles.mv10]} >
+                                        <View style={[styles.flex1,styles.pr10]}>
+                                            <Text>{item.title}</Text>
+                                            <Text numberOfLines={2} style={styles.gray}>{item.description}</Text>
+                                            <Text style={[styles.gray,styles.mt10]}>{item.price}</Text>
+                                        </View>
+                                        <Image style={[styles.imagesFeatures]} source={{uri: item.image}} />
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                        })}
+                    </View>
+                </Animated.ScrollView>
             </Container>
 
         );
@@ -350,8 +440,21 @@ const styles = StyleSheet.create({
     greenDeliveroo:{
         color: "#01cdbb"
     },
+    focusColor:{
+        backgroundColor: "#01cdbb",
+        color:'whitesmoke',
+        paddingVertical:3,
+        fontWeight: 'bold',
+        paddingHorizontal:12,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20
+    },
     fwb:{
-      fontWeight:'bold'
+        fontWeight:'bold',
+        fontSize:18,
+        marginTop:40
     },
     w100:{
         width: "80%",
@@ -368,6 +471,10 @@ const styles = StyleSheet.create({
     },
     title:{
         fontSize:30,
+    },
+    titleAnimated:{
+        fontSize:20,
+        fontWeight: 'bold'
     },
     widthTitle:{
         marginHorizontal:18,
